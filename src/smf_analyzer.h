@@ -27,24 +27,13 @@ namespace smf_analyzer
 	using namespace std::string_literals;
 
 	enum TextEncoding { ANSI, ShiftJIS };
+
+	// Defined names for the categories of events we're interested in counting
 	const static std::string TXT_BYTES = "Text Meta Events (bytes)";
 	const static std::string TXT_CODEPOINTS = "Text Meta Events (codepoints)";
 	const static std::string TXT_UTF8BYTES = "Text Meta Events (UTF-8 bytes)";
 	const static std::string NONTXT = "Non-Text Meta Events (bytes)";
-	const static std::string SYSEX = "SysEx Events (bytes)";
-
-	/* 
-		Recursively parse directory for all .smf, .mid, .midi files (SMF files)
-		Parse out meta events and universal sysex events
-		Determine, for each event: length, category/type, then amass a count of these in the histogram
-
-		First level function: Reads through file system, finds files, passes them to #2
-		Second level function: Reads through files, finds events, passes them to the histogram guy
-
-		We only care about the "contents" of text meta events, because we need to read out the length of them irrespective of their encoding	
-			Types from 0x01 to under 0x20 are all "text" events and need to be handled this way.
-			Other types are mostly fixed length with the exception of 0x7F "sequencer specific" also.
-	*/
+	const static std::string SYSEX = "Universal SysEx Real-Time Events (bytes)";
 
 	class SMF_Parser
 	{
@@ -52,22 +41,20 @@ namespace smf_analyzer
 		// Recursively scan a given directory and its sub-directories for SMF files.
 		void read_directory(std::map<std::string, Table>& tables, filesystem::path folder, std::ofstream& errstream);
 
-		// Parse relevant data (events, with their type and length) from an SMF file and load it into our histogram.
+		// Parse relevant events (their type and length in bytes) from an SMF file and save it into the relevant histogram.
 		void parse_file(std::map<std::string, Table>& tables, filesystem::path file, std::ofstream& errstream);
 
-		// Parse text event lengths from a text meta event (in bytes, code points, and utf-8 code points).
-		void parse_text_event(std::map<std::string, Table>& tables, std::vector<char> text, std::string eventType, std::ofstream& errstream);
+		// Parse lengths from a text meta event (in code points and utf-8 code points) and save it into the relevant histogram.
+		void parse_text_event(std::map<std::string, Table>& tables, std::vector<char> text, std::string eventType, TextEncoding encoding, std::ofstream& errstream);
 
 	private:
-		// Read a MIDI variable-length value from a file
+		// Read a MIDI variable-length value from a filestream
 		int read_variable_length(std::ifstream& fstream);
-
-		TextEncoding textEncoding = TextEncoding::ANSI;
 		
-		// Extensions of standard midi files (lowercase), which are relevant to our analysis.
+		// Possible extensions of standard midi files which are relevant to our analysis
 		const std::vector<std::string> SMF_EXTENSIONS = { ".smf", ".mid", ".midi", ".kar" }; 
 
-		// Map of meta event opcodes for output purposes
+		// Meta event names (mapped to opcodes) for output readability
 		const std::map<int, std::string> META_EVENT_OPCODES = {
 			{0x00, "Sequence Number"},
 			{0x20, "MIDI Channel Prefix"},
@@ -87,6 +74,7 @@ namespace smf_analyzer
 		};
 	};
 
+	// Exception type for identifying formatting issues in midi files
 	class MidiException : public std::exception {
 		const std::string message;
 	public:

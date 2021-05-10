@@ -100,7 +100,7 @@ void SMF_Parser::parse_file(std::map<std::string, Table>& tables, filesystem::pa
 
 	std::cout << "Analyzing file: " << file.u8string() << std::endl;
 	log << "file: " << file.filename().u8string() << std::endl; log.flush();
-	textEncoding = TextEncoding::ANSI; // Read text events as ANSI unless (until) the file tells us that it's in shift-JIS.
+	TextEncoding encoding = TextEncoding::ANSI; // Read text events as ANSI unless (until) the file tells us that it's in shift-JIS.
 
 	std::vector<char> buffer;
 	buffer.resize(5);
@@ -178,10 +178,10 @@ void SMF_Parser::parse_file(std::map<std::string, Table>& tables, filesystem::pa
 					if (std::string(buff, 2) == "{@"s) // Character code set tag begins with {@
 					{
 						if (std::toupper(buff, std::locale::classic()) == "{@LATIN}"s) {
-							textEncoding = TextEncoding::ANSI;
+							encoding = TextEncoding::ANSI;
 						}
 						else if (std::toupper(buff, std::locale::classic()) == "{@JP}"s) {
-							textEncoding = TextEncoding::ShiftJIS;
+							encoding = TextEncoding::ShiftJIS;
 						}
 						else { // If the codeset is unclear, don't change it and continue on, but report this anomaly
 							std::cerr << file << " - Unknown text encoding found: " << std::string(buff, length) << std::endl;
@@ -189,7 +189,7 @@ void SMF_Parser::parse_file(std::map<std::string, Table>& tables, filesystem::pa
 					}
 
 					// Parse length of text event in codepoints & UTF8 bytes, according to codeset, and put into histogram
-					parse_text_event(tables, buffer, eventName, log);
+					parse_text_event(tables, buffer, eventName, encoding, log);
 
 					// Input message type & length in regular bytes to histogram
 					tables[TXT_BYTES].columns[eventName].inc(length);
@@ -283,12 +283,12 @@ int SMF_Parser::read_variable_length (std::ifstream& ifs)
 	return len;
 }
 
-void SMF_Parser::parse_text_event (std::map<std::string, Table>& tables, std::vector<char> text, std::string eventType, std::ofstream& log)
+void SMF_Parser::parse_text_event (std::map<std::string, Table>& tables, std::vector<char> text, std::string eventType, TextEncoding encoding, std::ofstream& log)
 {
 	int length_utf8bytes = 0;
 	int length_codepoints = 0;
 
-	if (textEncoding == TextEncoding::ShiftJIS) // Text is in Shift-JIS
+	if (encoding == TextEncoding::ShiftJIS) // Text is in Shift-JIS
 	{
 		//log << "In Shift-JIS" << std::endl;
 		// Count lengths according to characters encoded
