@@ -6,9 +6,23 @@
 #include <map>
 #include <deque>
 
+#ifndef USING_FILESYSTEM_GHC
+#if __cplusplus < 201700
+#define USING_FILESYSTEM_GHC 1
+#endif
+#endif
+
+#if USING_FILESYSTEM_GHC
+#include <ghc/filesystem.hpp>
+#endif
 
 namespace smf_analyzer
 {
+#if USING_FILESYSTEM_GHC
+	namespace filesystem = ghc::filesystem;
+#else
+	namespace filesystem = std::filesystem;
+#endif
 	// 
 	class Histogram
 	{
@@ -32,10 +46,10 @@ namespace smf_analyzer
 
 	public:
 		// Load data from a file, merging into current data based on column names.
-		void load(std::filesystem::path path);
+		void load(filesystem::path path);
 
 		// Save data to file, skipping sizes not present in any histogram.
-		void save(std::filesystem::path path) const;
+		void save(filesystem::path path) const;
 
 		void operator=(const Table&) = delete;
 	};

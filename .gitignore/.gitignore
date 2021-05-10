@@ -10,6 +10,7 @@
 # Precompiled Headers
 *.gch
 *.pch
+*.ipch
 
 # Compiled Dynamic libraries
 *.so
@@ -30,3 +31,10 @@
 *.exe
 *.out
 *.app
+
+# Certain directories
+thirdparty\libcharsetdetect-master\**
+thirdparty\uchardet-0.0.7\**
+thirdparty\uchardet-master\**
+build_msvc\.vs\**
+build_msvc\Debug\**

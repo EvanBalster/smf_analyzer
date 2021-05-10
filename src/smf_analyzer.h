@@ -7,9 +7,23 @@
 
 #include "histogram.h"
 
+#ifndef USING_FILESYSTEM_GHC
+#if __cplusplus < 201700
+#define USING_FILESYSTEM_GHC 1
+#endif
+#endif
+
+#if USING_FILESYSTEM_GHC
+#include <ghc/filesystem.hpp>
+#endif
+
 namespace smf_analyzer
 {
+#if USING_FILESYSTEM_GHC
+	namespace filesystem = ghc::filesystem;
+#else
 	namespace filesystem = std::filesystem;
+#endif
 	using namespace std::string_literals;
 
 	enum TextEncoding { ANSI, ShiftJIS };
@@ -74,11 +88,12 @@ namespace smf_analyzer
 	};
 
 	class MidiException : public std::exception {
-		const char* message;
+		const std::string message;
 	public:
 		MidiException(const char* msg) : message(msg) {};
+		MidiException(const std::string& msg) : message(msg) {};
 		const char * what() const throw () {
-			return message;
+			return message.c_str();
 		}
 	};
 }

@@ -9,7 +9,7 @@
 using namespace smf_analyzer;
 
 
-void Table::load(std::filesystem::path path)
+void Table::load(filesystem::path path)
 {
 	// Use input exceptions and the CSV character classification
 	std::ifstream in;
@@ -84,7 +84,7 @@ void Table::load(std::filesystem::path path)
 	}
 }
 
-void Table::save(std::filesystem::path path) const
+void Table::save(filesystem::path path) const
 {
 	// Use output exceptions
 	std::ofstream out;

@@ -28,7 +28,6 @@ int main(int argc, char* argv[])
 	logpath += "log.txt";
 	log.open(logpath, std::ios_base::out); // A file in which to log all text event contents for reference and debugging.
 
-	std::cout << "Preparing for analysis..." << std::endl;
 	std::map<std::string, Table> myTables;
 	SMF_Parser parser;
 
@@ -71,7 +70,7 @@ void SMF_Parser::read_directory (std::map<std::string, Table>& tables, filesyste
 					try {
 						parse_file(tables, (*iter).path(), log);
 					}
-					catch (MidiException & e) { // Exception case for improperly formatted midi files.
+					catch (const MidiException& e) { // Exception case for improperly formatted midi files.
 						std::cerr << "MIDI FILE ERROR: " << e.what() << std::endl;
 					}
 					catch (const std::exception& e) { // Catch any other exceptions related to this file, and continue analyzing files.
@@ -87,6 +86,7 @@ void SMF_Parser::read_directory (std::map<std::string, Table>& tables, filesyste
 	}
 	catch (const filesystem::filesystem_error& e) { // Exception case for filesystem errors (most likely the directory does not exist)
 		std::cerr << "FILESYSTEM ERROR: " << e.what() << std::endl;
+		return;
 	}
 
 	std::cout << "Finished analysis of files in directory: " << folder.u8string() << std::endl;
@@ -123,8 +123,7 @@ void SMF_Parser::parse_file(std::map<std::string, Table>& tables, filesystem::pa
 		// Start of track
 		in.read(buff, 4); log << std::string(buff, 4) << " "; // MTrk 
 		if (std::string(buff, 4) != "MTrk"s) {
-			std::string errstr = "Improper track format at track #" + std::to_string(i) + ". Skipping remainder of file...";
-			throw MidiException(errstr.c_str());
+			throw MidiException("Improper track format at track #" + std::to_string(i+1) + ". Skipping remainder of file...");
 		}
 		in.read(buff, 4); // track length (in bytes past this point)
 		int trackLength = read4BE(reinterpret_cast<uint8_t*>(buff)); log << trackLength << " "; log.flush();
@@ -146,8 +145,7 @@ void SMF_Parser::parse_file(std::map<std::string, Table>& tables, filesystem::pa
 			else { // Running status is in use
 				// 0xF6 Tune request cannot come with data bytes and thus cannot be used with running status.
 				if (runningStatus == 0xF6 || runningStatus == 0xFF || runningStatus == 0xF0) { // Abandon this file, for it is cursed
-					std::string errstr = "Malformed running status in track #" + std::to_string(i) + ". Skipping remainder of file...";
-					throw MidiException(errstr.c_str());
+					throw MidiException("Malformed running status in track #" + std::to_string(i+1) + ". Skipping remainder of file...");
 				}
 				in.putback(statusByte); // this is not actually what we need for status, so return it to the stream for now
 				statusByte = runningStatus; // use running status as statusByte value
@@ -222,8 +220,7 @@ void SMF_Parser::parse_file(std::map<std::string, Table>& tables, filesystem::pa
 				}
 			}
 			else if (statusByte == 0xF4 || statusByte == 0xF5) { // Unused status codes; abandon this file for it is cursed
-				std::string errstr = "Malformed status byte in track #" + std::to_string(i) + ". Skipping remainder of file...";
-				throw MidiException(errstr.c_str());
+				throw MidiException("Malformed status byte in track #" + std::to_string(i+1) + ". Skipping remainder of file...");
 			}
 			else // Pass over to next event
 			{
