@@ -34,7 +34,9 @@ namespace smf_analyzer
 		// Load data from a file, merging into current data based on column names.
 		void load(std::filesystem::path path);
 
-		// Save data to filem skipping sizes not present in any histogram.
+		// Save data to file, skipping sizes not present in any histogram.
 		void save(std::filesystem::path path) const;
+
+		void operator=(const Table&) = delete;
 	};
 }

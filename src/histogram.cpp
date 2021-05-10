@@ -111,4 +111,5 @@ void Table::save(std::filesystem::path path) const
 		}
 		out << std::endl;
 	}
+	out.close();
 }

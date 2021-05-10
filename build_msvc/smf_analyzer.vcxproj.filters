@@ -29,5 +29,8 @@
     <ClInclude Include="..\src\histogram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\inline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
