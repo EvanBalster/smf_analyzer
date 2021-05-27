@@ -302,8 +302,8 @@ void SMF_Parser::parse_text_event (std::map<std::string, Table>& tables, std::ve
 				break;
 			case 4: // Two-byte character
 				[[fallthrough]];
-			case 7: // Two-byte character (2 codepoints, 3 bytes)
-				length_codepoints += 2;
+			case 7: // Two-byte character (1 codepoint, 3 bytes)
+				length_codepoints++;
 				length_utf8bytes += 3;
 				j++;
 				break;

@@ -8,7 +8,7 @@
 #include "histogram.h"
 
 #ifndef USING_FILESYSTEM_GHC
-#if __cplusplus < 201700
+#if __cplusplus < 201700 && _MSVC_LANG < 201700
 #define USING_FILESYSTEM_GHC 1
 #endif
 #endif
