@@ -1,0 +1,8 @@
+build_msvc/.vs/smf_analyzer/v15/*
+build_msvc/x64/Debug/*
+midi_data/statistics/*.csv
+midi_data/statistics/log.txt
+*.kar
+*.smf
+*.midi
+*.mid

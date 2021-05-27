@@ -103,6 +103,7 @@ void Table::save(filesystem::path path) const
 	// Write histogram data
 	for (size_t size : sizes)
 	{
+		out << size << ',';
 		for (auto &col : columns)
 		{
 			auto p = col.second.data.find(size);
