@@ -1,7 +1,9 @@
 build_msvc/.vs/smf_analyzer/v15/*
 build_msvc/x64/Debug/*
+build_msvc/x64/Release/*
 midi_data/statistics/*.csv
 midi_data/statistics/log.txt
+midi_data/*
 *.kar
 *.smf
 *.midi

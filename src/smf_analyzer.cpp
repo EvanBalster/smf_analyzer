@@ -98,6 +98,7 @@ void SMF_Parser::parse_file(std::map<std::string, Table>& tables, filesystem::pa
 	in.exceptions(std::ios::failbit | std::ios::badbit); // use std exceptions for in
 	in.open(file, std::ios_base::binary | std::ios_base::in);
 
+	log << "===== NEW FILE =====" << std::endl; log.flush();
 	std::cout << "Analyzing file: " << file.u8string() << std::endl;
 	log << "file: " << file.filename().u8string() << std::endl; log.flush();
 	TextEncoding encoding = TextEncoding::ANSI; // Read text events as ANSI unless (until) the file tells us that it's in shift-JIS.
@@ -320,7 +321,6 @@ void SMF_Parser::parse_text_event (std::map<std::string, Table>& tables, std::ve
 		length_codepoints = text.size();
 
 		// Count length in UTF-8 bytes
-		int length_utf8bytes = 0;
 		for (char c : text) {
 			if (c > 127) { // 2 byte extended-ASCII character
 				length_utf8bytes += 2;
