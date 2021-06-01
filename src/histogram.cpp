@@ -1,6 +1,7 @@
 #include <locale>
 #include <fstream>
 #include <sstream>
+#include <vector>
 #include <set>
 
 #include "histogram.h"
