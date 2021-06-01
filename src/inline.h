@@ -82,3 +82,20 @@ inline void write2LE(uint8_t *bytes, uint16_t n)
 		bytes[1] = src[0];
 	}
 }
+
+inline std::string toLowerString(const char* s) {
+	int len = strlen(s);
+	std::string lower = s;
+	for (int i = 0; i < len; i++) {
+		lower[i] = std::tolower(s[i], std::locale::classic());
+	}
+	return lower;
+}
+inline std::string toUpperString(const char* s) {
+	int len = strlen(s);
+	std::string upper = s;
+	for (int i = 0; i < len; i++) {
+		upper[i] = std::toupper(s[i], std::locale::classic());
+	}
+	return upper;
+}

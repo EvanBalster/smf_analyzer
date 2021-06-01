@@ -56,21 +56,21 @@ namespace smf_analyzer
 
 		// Meta event names (mapped to opcodes) for output readability
 		const std::map<int, std::string> META_EVENT_OPCODES = {
-			{0x00, "Sequence Number"},
-			{0x20, "MIDI Channel Prefix"},
-			{0x2F, "End of Track"},
-			{0x51, "Set Tempo"},
-			{0x54, "SMPTE Offset"},
-			{0x58, "Time Signature"},
-			{0x59, "Major/Minor Key Signature"},
-			{0x01, "Text Event"},
-			{0x02, "Copyright Notice"},
-			{0x03, "Sequence/Track Name"},
-			{0x04, "Instrument Name"},
-			{0x05, "Lyric"},
-			{0x06, "Marker"},
-			{0x07, "Cue Point"},
-			{0x7F, "Sequencer Specific"}
+			{0x00, "00_Sequence Num."},
+			{0x20, "32_Channel Prefix"},
+			{0x2F, "47_End of Track"},
+			{0x51, "81_Set Tempo"},
+			{0x54, "84_SMPTE Offset"},
+			{0x58, "88_Time Sig."},
+			{0x59, "89_Key Sig."},
+			{0x01, "01_Text"},
+			{0x02, "02_Copyright"},
+			{0x03, "03_Seq./Track"},
+			{0x04, "04_Instrument"},
+			{0x05, "05_Lyric"},
+			{0x06, "06_Marker"},
+			{0x07, "07_Cue Point"},
+			{0x7F, "127_Seq.Specific"}
 		};
 	};
 

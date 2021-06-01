@@ -55,13 +55,12 @@ void SMF_Parser::read_directory (std::map<std::string, Table>& tables, filesyste
 	std::cout << "Beginning analysis of files in directory: " << folder.u8string() << std::endl;
 
 	try {
-		for (filesystem::recursive_directory_iterator iter(folder); iter != filesystem::recursive_directory_iterator{} ; ++iter)
+		for (filesystem::recursive_directory_iterator iter(folder); iter != filesystem::recursive_directory_iterator{}; ++iter)
 		{
 			if ((*iter).is_regular_file()) // If the file is SMF, analyze it
 			{
 				// Get file's extension (case-insensitive)
-				std::string extension = (*iter).path().extension().u8string();
-				for (char& c : extension) c = std::tolower(c, std::locale::classic());
+				std::string extension = toLowerString((*iter).path().extension().u8string().c_str());
 
 				// Check if the file has one of our SMF file extensions
 				if (std::find(std::begin(SMF_EXTENSIONS), std::end(SMF_EXTENSIONS), extension) != std::end(SMF_EXTENSIONS))
@@ -178,14 +177,15 @@ void SMF_Parser::parse_file(std::map<std::string, Table>& tables, filesystem::pa
 					// Determine if character code set is defined by this message, and set ours if so
 					if (std::string(buff, 2) == "{@"s) // Character code set tag begins with {@
 					{
-						if (std::toupper(buff, std::locale::classic()) == "{@LATIN}"s) {
+						std::string codesetTag = toUpperString(buff);
+						if (codesetTag == "{@LATIN}"s) {
 							encoding = TextEncoding::ANSI;
 						}
-						else if (std::toupper(buff, std::locale::classic()) == "{@JP}"s) {
+						else if (codesetTag == "{@JP}"s) {
 							encoding = TextEncoding::ShiftJIS;
 						}
 						else { // If the codeset is unclear, don't change it and continue on, but report this anomaly
-							std::cerr << file << " - Unknown text encoding found: " << std::string(buff, length) << std::endl;
+							std::cerr << file << " - Unknown text encoding found: " << codesetTag << std::endl;
 						}
 					}
 
