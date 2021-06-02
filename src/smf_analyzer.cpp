@@ -20,21 +20,44 @@ using namespace std::string_literals;
 */
 int main(int argc, char* argv[])
 {
+	// Check for malformed arguments or help requests.
+	if (argc != 3 || (argv[1] == "help"s || argv[1] == "--help"s)) 
+	{
+		std::cout << "smf_analyzer.exe accepts 2 arguments:" << std::endl;
+		std::cout << "1) name of the directory to (recursively) scan SMF files from, and" << std::endl;
+		std::cout << "2) name of the directory to output CSV data files to." << std::endl;
+		std::cout << "Make sure both of these directories exist and then try running the program again." << std::endl;
+		return 0;
+	}
+
+	// Set up input/output file paths.
 	filesystem::path input = argv[1]; 
+	if (!filesystem::exists(input)) {
+		std::cout << "ERROR: Given input directory does not exist! Terminating..." << std::endl;
+		std::cout << "(Type \"--help\" if you need usage assistance!)" << std::endl;
+		return 1;
+	}
 	filesystem::path output = argv[2];
+	filesystem::create_directories(output); // Create this directory if it does not exist.
+
+	// Set up log.txt to record all text event contents (for reference and debugging)
 	std::ofstream log;
 	filesystem::path logpath = output;
 	logpath += "/";
 	logpath += "log.txt";
-	log.open(logpath, std::ios_base::out); // A file in which to log all text event contents for reference and debugging.
+	log.open(logpath, std::ios_base::out);
 
+	// Set up parsing and data collection
 	std::map<std::string, Table> myTables;
 	SMF_Parser parser;
 
+	// Do the analysis; record statistics to myTables
 	parser.read_directory(myTables, input, log);
 
+	// Output analysis data to CSV files in output folder
 	std::cout << "Saving histograms to output folder: " << output << std::endl;
-	for (std::map<std::string,Table>::iterator it = myTables.begin(); it != myTables.end(); ++it) {
+	for (std::map<std::string,Table>::iterator it = myTables.begin(); it != myTables.end(); ++it) 
+	{
 		filesystem::path p = output;
 		p += "/";
 		p += it->first;
@@ -45,6 +68,7 @@ int main(int argc, char* argv[])
 		(it->second).save(p);
 	}
 
+	// All done!
 	std::cout << "Analysis completed." << std::endl;
 	return 0;
 }
